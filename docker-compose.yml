@@ -6,7 +6,7 @@ services:
         ports:
             - 8080:8080
         volumes:
-            - $HOME/docker/webdav:/media
+            - "./public:/media"
         environment:
             - USERNAME=webdav
             - PASSWORD=webdav
