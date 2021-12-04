@@ -4,12 +4,12 @@ services:
         container_name: webdav
         image: ghcr.io/mirorauhala/docker-webdav:master
         ports:
-            - 8080:8080
+            - ${WEBDAV_PORT:8080}:8080
         volumes:
             - "./public:/media"
         environment:
-            - USERNAME=webdav
-            - PASSWORD=webdav
+            - USERNAME=${WEBDAV_USER:webdav}
+            - PASSWORD=${WEBDAV_PASS:webdav}
             - UID=1000
             - GID=1000
             - TZ=Europe/Helsinki
