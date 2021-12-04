@@ -2,7 +2,7 @@ version: "2"
 services:
     webdav:
         container_name: webdav
-        image: mirorauhala/webdav
+        image: ghcr.io/mirorauhala/webdav:master
         ports:
             - 8080:8080
         volumes:
