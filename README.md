@@ -1,60 +1,51 @@
-# Servidor webdav partiendo de debian-testing
+# Simple nginx-webdav server
 
-##  Clonar el repositorio
-
-```
-git clone https://github.com/uGeek/docker-nginx-webdav.git
-```
-
-y accedemos al interior de la carpeta:
+## Clone the repository
 
 ```
-cd docker-nginx-webdav
+git clone https://github.com/mirorauhala/docker-webdav.git
 ```
 
-## Construir la imagen
+## Build the image
+
 ```
-docker build -t ugeek/webdav:arm .
+docker build -t mirorauhala/webdav:latest .
 ```
 
-## Ver el número de imagen:
-```
-docker images
-```
-
-## Montar el contenedor
+## Running the container
 
 ### docker-cli
-USERNAME: webdav
-PASSWORD: webdav
-PUERTO: 80
 
 --restart=unless-stopped: Iniciar cada vez que iniciemos el servidor
 
-
 ```
+
+WEBDAV_USERNAME=webdav
+WEBDAV_PASSWORD=webdav
+WEBDAV_PORT=8080
+
 docker run --name webdav \
   --restart=unless-stopped \
-  -p 80:80 \
+  -p $WEBDAV_PORT:8080 \
   -v $HOME/docker/webdav:/media \
-  -e USERNAME=webdav \
-  -e PASSWORD=webdav \
-  -e TZ=Europe/Madrid \
+  -e USERNAME=$WEBDAV_USERNAME \
+  -e PASSWORD=$WEBDAV_PASSWORD \
+  -e TZ=Europe/Helsinki \
   -e UDI=1000 \
   -e GID=1000 \
-  -d  ugeek/webdab:arm
+  -d  mirorauhala/webdab
 ```
 
-### docker-compose con traefik y proxy inverso
+### docker-compose with Traefik reverse-proxy
 
 ```
 version: '2'
 services:
   webdav:
     container_name: webdav
-    image: ugeek/webdav:arm
+    image: mirorauhala/webdav
     ports:
-      - 80:80
+      - 8080:8080
     volumes:
       - $HOME/docker/webdav:/media
     environment:
@@ -62,11 +53,11 @@ services:
       - PASSWORD=webdav
       - UID=1000
       - GID=1000
-      - TZ=Europe/Madrid
+      - TZ=Europe/Helsinki
     networks:
       - web
     labels:
-      - traefik.backend=webdav                                                                                               
+      - traefik.backend=webdav
       - traefik.frontend.rule=Host:webdav.tu_dominio.duckdns.org
       - traefik.docker.network=web
       - traefik.port=80
@@ -82,40 +73,31 @@ services:
       - traefik.http.middlewares.securedheaders.headers.frameDeny=true
       - traefik.http.middlewares.securedheaders.headers.browserXssFilter=true
       - traefik.http.middlewares.securedheaders.headers.contentTypeNosniff=true
-networks:                                                                                                                   
+networks:
   web:
-   external: true 
+   external: true
 ```
 
 Introduce el comando...
+
 ```
 docker-compose up -d
 ```
 
-
 ## Logs
 
-Añadido nuevo registro de logs.
+View the logs.
 
-### Ver logs
+(TODO: use stdout)
 
-```
-docker exec -it webdav cat /var/log/nginx/webdav_access.log
-```
-
-### Logs en tiempo real
+### Access logs
 
 ```
 docker exec -it webdav cat /var/log/nginx/webdav_access.log
 ```
 
+### Error logs
 
-
-### logs con error
 ```
 docker exec -it webdav /var/log/nginx/webdav_error.log
 ```
-
-
-
-
